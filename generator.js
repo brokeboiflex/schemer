@@ -1,7 +1,7 @@
 // generator.js
 const fs = require("fs");
+const fspath = require("path");
 const chokidar = require("chokidar");
-const jsonSchemaToTS = require("json-schema-to-typescript");
 
 const {
   quicktype,
@@ -37,7 +37,6 @@ async function generateTypes() {
       },
     })
       .then((tsContent) => {
-        console.log(tsContent.lines.join("\n"));
         fs.writeFileSync(outputFile, tsContent.lines.join("\n"));
         console.log(
           `TypeScript types generated for ${inputFile} and written to ${outputFile}`
@@ -55,14 +54,34 @@ async function generateTypes() {
 function watchJSONAndGenerateTypes() {
   const config = readConfig();
 
-  chokidar.watch(config.jsonFiles).on("change", (path) => {
+  chokidar.watch(config.jsonFiles).on("change", async (path) => {
+    console.log("file: " + path + " changed");
     const inputFile = path;
-    const outputFile = config.outputFiles[config.jsonFiles.indexOf(path)];
 
-    jsonSchemaToTS
-      .compileFromFile(inputFile, { ignoreMinAndMaxItems: true })
+    const outputFile = await config.outputFiles[config.jsonFiles.indexOf(path)];
+
+    const file = fs.readFileSync(inputFile, "utf8");
+
+    const jsonInput = jsonInputForTargetLanguage("typescript");
+
+    await jsonInput.addSource({
+      name: "file",
+      samples: [file],
+    });
+    const inputData = new InputData();
+    inputData.addInput(jsonInput);
+
+    await quicktype({
+      inputData,
+      lang: new TypeScriptTargetLanguage(),
+      alphabetizeProperties: true,
+
+      rendererOptions: {
+        "just-types": "true",
+      },
+    })
       .then((tsContent) => {
-        fs.writeFileSync(outputFile, tsContent);
+        fs.writeFileSync(outputFile, tsContent.lines.join("\n"));
         console.log(
           `TypeScript types generated for ${inputFile} and written to ${outputFile}`
         );
