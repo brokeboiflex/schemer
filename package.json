@@ -1,6 +1,6 @@
 {
   "name": "jsontsschemer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Package to watch JSON files and generate TypeScript types",
   "keywords": [
     "json",

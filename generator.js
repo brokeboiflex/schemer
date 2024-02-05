@@ -17,11 +17,10 @@ async function generateTypes() {
   await config.jsonFiles.forEach(async (inputFile, index) => {
     const outputFile = config.outputFiles[index];
     const file = fs.readFileSync(inputFile, "utf8");
-
+    const base = fspath.basename(inputFile, ".json");
     const jsonInput = jsonInputForTargetLanguage("typescript");
-
     await jsonInput.addSource({
-      name: "file",
+      name: base,
       samples: [file],
     });
     const inputData = new InputData();
@@ -55,7 +54,6 @@ function watchJSONAndGenerateTypes() {
   const config = readConfig();
 
   chokidar.watch(config.jsonFiles).on("change", async (path) => {
-    console.log("file: " + path + " changed");
     const inputFile = path;
 
     const outputFile = await config.outputFiles[config.jsonFiles.indexOf(path)];
@@ -63,9 +61,10 @@ function watchJSONAndGenerateTypes() {
     const file = fs.readFileSync(inputFile, "utf8");
 
     const jsonInput = jsonInputForTargetLanguage("typescript");
+    const base = fspath.basename(inputFile, ".json");
 
     await jsonInput.addSource({
-      name: "file",
+      name: base,
       samples: [file],
     });
     const inputData = new InputData();
