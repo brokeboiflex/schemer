@@ -1,0 +1,35 @@
+{
+  "name": "jsontsschemer",
+  "version": "1.1.0",
+  "description": "Package to watch JSON files and generate TypeScript types",
+  "keywords": [
+    "json",
+    "typescript",
+    "generator",
+    "watcher"
+  ],
+  "bin": "./index.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepack": "npmignore --auto",
+    "gen": "node index.js gen",
+    "watch": "node index.js watch"
+  },
+  "author": "brokeboiflex",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "json-schema-to-typescript": "^13.1.2",
+    "quicktype": "^23.0.81"
+  },
+  "devDependencies": {
+    "npmignore": "^0.3.1"
+  },
+  "publishConfig": {
+    "ignore": [
+      "node_modules/",
+      "schemer.json/"
+    ]
+  }
+}
